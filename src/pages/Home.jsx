@@ -1,7 +1,7 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 
-export default function Home(){
+export default function Home() {
+  const navigate = useNavigate();
   return (
     <section className="home">
       <div className="hero">
@@ -9,12 +9,18 @@ export default function Home(){
           <img src="/assets/beacon.png" alt="منارة" />
         </div>
         <div className="hero-content">
-          <h1 className="sadu-heading">كشف المخالفات في محتوى وسائل التواصل الاجتماعي</h1>
+          <h1 className="sadu-heading">
+            كشف المخالفات في محتوى وسائل التواصل الاجتماعي
+          </h1>
           <p>
             النظام يستخدم الذكاء الاصطناعي لمراقبة مقاطع الفيديو في الزمن الحقيقي
             واكتشاف مخالفات مثل التنمّر، الملابس غير اللائقة، استغلال الأطفال، والمعلومات المضللة.
           </p>
-          <Link to="/realtime" className="cta">بدء الكشف في الوقت الفعلي</Link>
+          
+          {/* زر بدل الرابط */}
+          <button className="cta" onClick={() => navigate("/realtime")}>
+            بدء الكشف في الوقت الفعلي
+          </button>
         </div>
       </div>
 
@@ -25,8 +31,8 @@ export default function Home(){
           <div className="card-header"></div>
           <div className="card-body">
             <div className="title">
-              <span className="icon">🛡️</span>
               <span>منظار</span>
+              <span className="icon">🛡️</span>
             </div>
             <p>اكتشاف المخالفات البصرية باستخدام الرؤية الحاسوبية.</p>
           </div>
@@ -36,8 +42,8 @@ export default function Home(){
           <div className="card-header"></div>
           <div className="card-body">
             <div className="title">
-              <span className="icon">🔍</span>
               <span>الـ NLP</span>
+              <span className="icon">🔍</span>
             </div>
             <p>تحليل النصوص والكلام لاكتشاف التنمّر والمعلومات المضللة.</p>
           </div>
@@ -47,10 +53,10 @@ export default function Home(){
           <div className="card-header"></div>
           <div className="card-body">
             <div className="title">
-              <span className="icon">🎥</span>
               <span>بث مباشر</span>
+              <span className="icon">🎥</span>
             </div>
-            <p>مراقبة اللحظة للحماية من المحتوى الضار في البثوص.</p>
+            <p>مراقبة اللحظة للحماية من المحتوى الضار في البثوث.</p>
           </div>
         </div>
 
