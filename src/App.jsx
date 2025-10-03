@@ -5,6 +5,8 @@ import Realtime from "./pages/Realtime.jsx";
 import Header from "./components/Header.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Splash from "./components/Splash.jsx"; // استدعاء مكوّن Splash
+import Members from "./pages/Members";
+
 
 export default function App() {
   const { pathname } = useLocation();
@@ -18,6 +20,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/realtime" element={<Realtime />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/members" element={<Members />} />
           </Routes>
         </main>
         <footer className="footer">
