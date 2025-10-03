@@ -18,6 +18,17 @@ function useBeep(){
   }
 }
 
+// 👇 القوائم خارج Realtime component أو داخل useEffect فوق fallback
+const IMAGE_KINDS = [
+  "استغلال الأطفال كمحتوى",
+  "الألفاظ المبتذلة أو التباهي بالأموال أو الممتلكات",
+  "إثارة القبلية أو العنصرية أو الطائفية",
+  "كشف الجسد من الكتفين حتى الساقين"
+];
+const AUDIO_KINDS = [
+  "التنمر أو الاستهزاء بالآخرين"
+];
+
 export default function Realtime(){
   const [imageEvents, setImageEvents] = useState([]);
   const [audioEvents, setAudioEvents] = useState([]);
@@ -25,7 +36,6 @@ export default function Realtime(){
   const beep = useBeep();
 
   useEffect(() => {
-    // Prefer SSE: /api/events (server should stream events in JSON lines)
     const src = new EventSource('/api/events');
     src.onopen = () => setConnected(true);
     src.onerror = () => setConnected(false);
@@ -37,29 +47,38 @@ export default function Realtime(){
       } catch(err){ console.error(err); }
     }
 
-    // Fallback: local mock generator when SSE not available
+    // ✅ fallback when SSE not available
     const fallback = setInterval(() => {
       if (connected) return;
       const now = Date.now();
       const isImage = Math.random() > 0.5;
+
       const sample = {
         id: now,
         ts: now,
-        kind_ar: isImage ? 'ملابس غير لائقة' : 'تنمّر لفظي',
+        kind_ar: isImage 
+          ? IMAGE_KINDS[Math.floor(Math.random() * IMAGE_KINDS.length)]
+          : AUDIO_KINDS[0],
         status: Math.random() > 0.6 ? 'verified' : 'pending',
         type: isImage ? 'image' : 'audio',
         image_url: isImage ? '/assets/wrong.jpg' : undefined,
         audio_url: !isImage ? '/assets/sample-voice.mp3' : undefined,
         title: isImage ? 'لقطة شاشة' : 'مقطع صوتي',
-        desc: isImage ? 'اكتشاف احتمالي لمخالفة مظهر' : 'محتوى لفظي قد يحتوي تنمّر'
+        desc: isImage 
+          ? 'تم اكتشاف احتمالي لمخالفة ضمن الصور'
+          : 'تم اكتشاف احتمالي لمخالفة صوتية'
       };
+
       addEvent(sample);
       beep();
     }, 4000);
 
     function addEvent(ev){
-      if(ev.type === 'image'){ setImageEvents(prev => [ev, ...prev].slice(0, 50)); }
-      else { setAudioEvents(prev => [ev, ...prev].slice(0, 50)); }
+      if(ev.type === 'image'){ 
+        setImageEvents(prev => [ev, ...prev].slice(0, 50)); 
+      } else { 
+        setAudioEvents(prev => [ev, ...prev].slice(0, 50)); 
+      }
     }
 
     return () => { src.close(); clearInterval(fallback); }
