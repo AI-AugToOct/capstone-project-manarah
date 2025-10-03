@@ -4,7 +4,9 @@ export default function NotificationCard({ item }){
   return (
     <div className={`card ${item.type === 'audio' ? 'audio' : 'image'}`}>
       <div className="card-header">
-        <span className="badge kind">{item.kind_ar}</span>
+        <span className="badge kind">
+          {item.kind_ar}
+        </span>
         <span className={`badge status ${item.status === 'verified' ? 'ok' : 'pending'}`}>
           {item.status === 'verified' ? 'تم التحقق' : 'قيد المراجعة'}
         </span>
