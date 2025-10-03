@@ -391,7 +391,7 @@ html,body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #050b20; /* نفس خلفية الهيرو */
+  background: #ffffff; /* نفس خلفية الهيرو */
   height: 100vh;
   width: 100%;
   position: fixed;
@@ -416,4 +416,87 @@ html,body {
 
 @keyframes fadeOut {
   to { opacity: 0; visibility: hidden; }
+}
+.members {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 30px;
+  color: var(--saudi-green);
+}
+
+.members-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.member-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.member-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.member-photo {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--saudi-green);
+  margin-bottom: 14px;
+}
+
+.member-card h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #222;
+}
+
+.member-card p {
+  margin: 6px 0 12px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.linkedin-link {
+  display: inline-block;
+  padding: 6px 12px;
+  background: var(--saudi-green);
+  color: white;
+  border-radius: 6px;
+  font-size: 13px;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+.linkedin-link:hover {
+  background: #00994d;
+}
+/* أنواع مختلفة */
+.badge.kind {
+  font-weight: 700;
+  background: #f9fafb;
+  border: 1px solid #ddd;
+}
+
+.card.image .badge.kind {
+  color: #b91c1c; /* أحمر للتنبيه البصري */
+}
+
+.card.audio .badge.kind {
+  color: #1d4ed8; /* أزرق للتنبيه الصوتي */
 }
