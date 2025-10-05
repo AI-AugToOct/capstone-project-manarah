@@ -449,7 +449,7 @@ def main():
     """الدالة الرئيسية"""
     
     # 1. ضع مفتاح API هنا
-    API_KEY = "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"  # ضع مفتاحك هنا
+    API_KEY = ""  # ضع مفتاحك هنا
     
     if not API_KEY:
         print("❌ خطأ: يرجى إضافة مفتاح OpenAI API")
