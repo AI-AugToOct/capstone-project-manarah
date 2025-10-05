@@ -6,6 +6,7 @@ import Header from "./components/Header.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Splash from "./components/Splash.jsx"; // استدعاء مكوّن Splash
 import Members from "./pages/Members";
+import AutoScan from "./pages/AutoScan";
 
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
             <Route path="/realtime" element={<Realtime />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/members" element={<Members />} />
+            <Route path="/autoscan" element={<AutoScan />} />
           </Routes>
         </main>
         <footer className="footer">
