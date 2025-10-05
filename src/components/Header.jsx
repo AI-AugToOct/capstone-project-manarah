@@ -19,6 +19,9 @@ export default function Header() {
         >
           الرئيسية
         </NavLink>
+        <NavLink to="/autoscan" className={({ isActive }) => isActive ? "active" : ""}>
+          فحص تلقائي
+        </NavLink>
 
         <NavLink 
           to="/realtime" 
@@ -33,6 +36,12 @@ export default function Header() {
         >
           لوحة التحكم
         </NavLink>
+        <NavLink 
+          to="/members" 
+          className={({ isActive }) => isActive ? "active" : ""}>
+          أعضاء الفريق
+        </NavLink>
+
       </nav>
 
     </header>
