@@ -21,12 +21,13 @@ function useBeep(){
 // 👇 القوائم خارج Realtime component أو داخل useEffect فوق fallback
 const IMAGE_KINDS = [
   "استغلال الأطفال كمحتوى",
-  "الألفاظ المبتذلة أو التباهي بالأموال أو الممتلكات",
+  "التباهي بالأموال أو الممتلكات",
   "إثارة القبلية أو العنصرية أو الطائفية",
   "كشف الجسد من الكتفين حتى الساقين"
 ];
 const AUDIO_KINDS = [
-  "التنمر أو الاستهزاء بالآخرين"
+  "التنمر أو الاستهزاء بالآخرين",
+  "الألفاظ المبتذلة"
 ];
 
 export default function Realtime(){
@@ -57,7 +58,7 @@ export default function Realtime(){
         id: now,
         ts: now,
         kind_ar: isImage 
-          ? IMAGE_KINDS[Math.floor(Math.random() * IMAGE_KINDS.length)]
+          ? IMAGE_KINDS[1]
           : AUDIO_KINDS[0],
         status: Math.random() > 0.6 ? 'verified' : 'pending',
         type: isImage ? 'image' : 'audio',
