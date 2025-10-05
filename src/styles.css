@@ -498,5 +498,249 @@ html,body {
 }
 
 .card.audio .badge.kind {
-  color: #1d4ed8; /* أزرق للتنبيه الصوتي */
+  color: #ffaa00; /* أزرق للتنبيه الصوتي */
+}
+/* === تحسين واجهة صفحة الفحص التلقائي === */
+
+.autoscan {
+  padding: 60px 0 140px; /* يضيف مساحة كبيرة للأعلى والأسفل */
+  min-height: 100vh; /* يجعل الصفحة أطول من الشاشة */
+}
+
+.autoscan h1 {
+  text-align: center;
+  color: var(--saudi-green);
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.autoscan p {
+  text-align: center;
+  font-size: 15px;
+  margin-bottom: 30px;
+}
+
+/* ✅ صندوق الرفع */
+.autoscan .upload-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.autoscan .upload-inner {
+  background: #fff;
+  border: 3px dashed rgba(0, 108, 53, 0.35);
+  border-radius: 20px;
+  padding: 50px 60px;
+  width: 70%;
+  max-width: 600px;
+  text-align: center;
+  transition: all 0.4s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.autoscan .upload-inner:hover {
+  border-color: var(--saudi-green);
+  background: #f8fcf9;
+  transform: scale(1.02);
+}
+
+.autoscan .big-icon {
+  font-size: 65px;
+  margin-bottom: 10px;
+  opacity: 0.8;
+}
+
+.autoscan .hint {
+  color: #888;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* ✅ الفيديو المعاين */
+.autoscan .preview {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.autoscan video {
+  border-radius: 16px;
+  border: 3px solid rgba(0, 108, 53, 0.15);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  max-width: 600px;
+  width: 80%;
+}
+
+/* ✅ النتائج */
+.autoscan .results {
+  margin-top: 50px;
+  background: #fff;
+  border-radius: 18px;
+  padding: 30px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  max-width: 900px;
+  margin-inline: auto;
+}
+
+.autoscan .result-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  border-bottom: 2px solid var(--saudi-green);
+  padding-bottom: 10px;
+}
+
+.autoscan .result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.autoscan .result-card {
+  background: #fdfdfd;
+  border-radius: 14px;
+  padding: 20px;
+  border: 1px solid #eee;
+  transition: all 0.3s ease;
+}
+
+.autoscan .result-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 108, 53, 0.1);
+}
+
+.autoscan .result-card h3 {
+  color: var(--saudi-green);
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.autoscan ul.labels {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.autoscan ul.labels li {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+  color: #333;
+}
+
+.autoscan ul.labels li:last-child {
+  border-bottom: none;
+}
+
+.autoscan .conf {
+  color: var(--saudi-green);
+  font-weight: 700;
+}
+
+.autoscan .foot-note {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 13px;
+  color: #666;
+}
+.cta-scan {
+  display: inline-block;
+  background: linear-gradient(135deg, #006C35, #00994d);
+  color: white;
+  padding: 14px 36px;
+  border: none;
+  border-radius: 50px;
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 6px 16px rgba(0, 108, 53, 0.35);
+  transition: all 0.35s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  gap: 10px;
+}
+
+/* لمعة تمر فوق الزر */
+.cta-scan::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -80px;
+  width: 60px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.4);
+  transform: skewX(-20deg);
+  transition: 0.5s;
+}
+
+.cta-scan:hover::after {
+  left: 120%;
+}
+
+.cta-scan:hover {
+  background: linear-gradient(135deg, #00994d, #00b35c);
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 10px 22px rgba(0, 108, 53, 0.55);
+}
+
+.cta-scan:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(0, 108, 53, 0.3);
+}
+.decision-card {
+  margin: 60px auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  max-width: 700px;
+  text-align: center;
+  animation: fadeIn 0.8s ease;
+}
+
+.decision-card h2 {
+  color: var(--saudi-green);
+  font-size: 22px;
+  margin-bottom: 30px;
+}
+
+.decision-item {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #eee;
+  padding: 10px 0;
+  font-size: 16px;
+}
+
+.decision-item .label {
+  font-weight: 700;
+  color: #333;
+}
+
+.decision-item .value {
+  color: var(--saudi-green);
+  font-weight: 600;
+}
+
+.foot-note {
+  margin-top: 25px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
