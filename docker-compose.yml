@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  manarah-api:
+    build: .
+    container_name: manarah-api
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - API_PORT=8000
+      - LOG_LEVEL=INFO
+      - MAX_UPLOAD_SIZE_MB=500
+      - FRAME_EXTRACTION_FPS=15
+      - AUTO_REMOVE_THRESHOLD=0.85
+      - REVIEW_THRESHOLD=0.60
+      - WARNING_THRESHOLD=0.40
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  data:
+  logs:
