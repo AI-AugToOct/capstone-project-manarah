@@ -1,66 +1,49 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 
-export default function Home() {
+export default function Header() {
   const navigate = useNavigate();
+
   return (
-    <section className="home">
-      <div className="hero">
-        <div className="hero-image">
-          <img src="/assets/beacon.png" alt="منارة" />
-        </div>
-        <div className="hero-content">
-          <h1 className="sadu-heading">
-            كشف المخالفات في محتوى وسائل التواصل الاجتماعي
-          </h1>
-          <p>
-            النظام يستخدم الذكاء الاصطناعي لمراقبة مقاطع الفيديو في الزمن الحقيقي
-            واكتشاف مخالفات مثل التنمّر، الملابس غير اللائقة، استغلال الأطفال، والمعلومات المضللة.
-          </p>
-          
-          {/* زر بدل الرابط */}
-          <button className="cta" onClick={() => navigate("/realtime")}>
-            بدء الكشف في الوقت الفعلي
-          </button>
-        </div>
+    <header className="header">
+      <div className="brand" onClick={() => navigate("/")}>
+        <img src="/assets/icon1.png" alt="Logo" className="brand-icon" />
+        <span className="divider">|</span>
+        <span className="brand-sub">كشف مخالفات المحتوى</span>
       </div>
 
-      <div className="sadu-strip"></div>
+      <nav className="nav">
+        <NavLink 
+          to="/" 
+          className={({ isActive }) => isActive ? "active" : ""}
+          end
+        >
+          الرئيسية
+        </NavLink>
+        <NavLink to="/autoscan" className={({ isActive }) => isActive ? "active" : ""}>
+          فحص تلقائي
+        </NavLink>
 
-      <section className="features-row">
-        <div className="feature-card">
-          <div className="card-header"></div>
-          <div className="card-body">
-            <div className="title">
-              <span>منظار</span>
-              <span className="icon">🛡️</span>
-            </div>
-            <p>اكتشاف المخالفات البصرية باستخدام الرؤية الحاسوبية.</p>
-          </div>
-        </div>
+        <NavLink 
+          to="/realtime" 
+          className={({ isActive }) => isActive ? "active" : ""}
+        >
+          الكشف اللحظي
+        </NavLink>
 
-        <div className="feature-card">
-          <div className="card-header"></div>
-          <div className="card-body">
-            <div className="title">
-              <span>الـ NLP</span>
-              <span className="icon">🔍</span>
-            </div>
-            <p>تحليل النصوص والكلام لاكتشاف التنمّر والمعلومات المضللة.</p>
-          </div>
-        </div>
+        <NavLink 
+          to="/dashboard" 
+          className={({ isActive }) => isActive ? "active" : ""}
+        >
+          لوحة التحكم
+        </NavLink>
+        <NavLink 
+          to="/members" 
+          className={({ isActive }) => isActive ? "active" : ""}>
+          أعضاء الفريق
+        </NavLink>
 
-        <div className="feature-card">
-          <div className="card-header"></div>
-          <div className="card-body">
-            <div className="title">
-              <span>بث مباشر</span>
-              <span className="icon">🎥</span>
-            </div>
-            <p>مراقبة اللحظة للحماية من المحتوى الضار في البثوث.</p>
-          </div>
-        </div>
+      </nav>
 
-      </section>
-    </section>
-  )
+    </header>
+  );
 }
