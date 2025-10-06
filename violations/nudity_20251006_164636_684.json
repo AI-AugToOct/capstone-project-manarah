@@ -1,0 +1,38 @@
+{
+  "type": "nudity",
+  "type_ar": "محتوى إباحي",
+  "timestamp": "20251006_164636_684",
+  "max_score": 0.8007997274398804,
+  "detections": [
+    {
+      "category": "BELLY_EXPOSED",
+      "score": 0.8007997274398804,
+      "bbox": [
+        370,
+        1554,
+        413,
+        253
+      ]
+    },
+    {
+      "category": "FEMALE_BREAST_COVERED",
+      "score": 0.7206975817680359,
+      "bbox": [
+        473,
+        1136,
+        346,
+        378
+      ]
+    },
+    {
+      "category": "FEMALE_BREAST_COVERED",
+      "score": 0.6216037273406982,
+      "bbox": [
+        248,
+        1221,
+        285,
+        322
+      ]
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "type": "child_exploitation",
+  "type_ar": "استغلال أطفال",
+  "timestamp": "20251006_164617_948",
+  "decision": "SUSPECT",
+  "score": 0.5077505658070246,
+  "track_id": 1,
+  "bbox": [
+    3,
+    266,
+    1280,
+    2821
+  ],
+  "metrics": {
+    "1": {
+      "appearance_ratio": 0.4,
+      "centered_ratio": 1.0,
+      "avg_confidence": 0.5077505658070246,
+      "avg_size_ratio": 0.8993186858076564,
+      "last_bbox": [
+        3,
+        266,
+        1280,
+        2821
+      ],
+      "lifespan": 8,
+      "presence_count": 6,
+      "centered_count": 6
+    }
+  },
+  "severity_by_id": {
+    "1": {
+      "severity": "SUSPECT",
+      "score": 0.5077505658070246
+    }
+  }
+}
