@@ -1,5 +1,6 @@
 """Text analysis module using Whisper and GPT-4."""
 import logging
+import json
 from pathlib import Path
 from typing import Dict, Any, Optional
 from openai import OpenAI
@@ -163,19 +164,45 @@ class TextAnalyzer:
             # Parse response
             result_text = response.choices[0].message.content
             
+            # Ensure we have content
+            if not result_text:
+                logger.warning("Empty response from GPT-4")
+                return {
+                    "violations": [],
+                    "violation_score": 0.0,
+                    "overall_assessment": "",
+                    "parse_error": True
+                }
+            
             # Try to parse as JSON
-            import json
+            # Strip markdown code blocks if present
+            if result_text.strip().startswith("```"):
+                # Remove ```json or ``` at start
+                result_text = result_text.strip()
+                if result_text.startswith("```json"):
+                    result_text = result_text[7:]  # Remove ```json
+                elif result_text.startswith("```"):
+                    result_text = result_text[3:]  # Remove ```
+                
+                # Remove closing ```
+                if result_text.endswith("```"):
+                    result_text = result_text[:-3]
+                
+                result_text = result_text.strip()
+            
             result = json.loads(result_text)
             
             logger.info(f"Text analyzed, score={result.get('violation_score', 0)}")
             return result
             
-        except json.JSONDecodeError:
-            logger.warning("Failed to parse JSON response from GPT-4")
+        except json.JSONDecodeError as e:
+            logger.warning(f"Failed to parse JSON response from GPT-4: {e}")
+            safe_text = result_text if 'result_text' in locals() and result_text else 'Unknown'
+            logger.warning(f"Raw response: {safe_text[:200]}...")
             return {
                 "violations": [],
                 "violation_score": 0.0,
-                "overall_assessment": result_text,
+                "overall_assessment": safe_text if safe_text != 'Unknown' else "",
                 "parse_error": True
             }
         except Exception as e:

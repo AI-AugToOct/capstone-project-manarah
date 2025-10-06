@@ -1,5 +1,6 @@
 """Main API routes for Manarah backend."""
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, BackgroundTasks
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pathlib import Path
 import tempfile
@@ -7,6 +8,9 @@ import shutil
 import logging
 from typing import Optional
 from datetime import datetime
+import uvicorn
+import os
+
 
 from src.config import settings
 from src.storage import (
@@ -31,6 +35,20 @@ app = FastAPI(
     title="Manarah Content Moderation API",
     description="AI-powered content moderation for Saudi social media",
     version="1.0.0"
+)
+
+# Add CORS middleware for React frontend integration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",  # Vite default
+        "http://localhost:3000",  # React default
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -155,6 +173,13 @@ async def upload_content(
         
         # Validate file type
         allowed_extensions = [".mp4", ".mov", ".avi", ".jpg", ".jpeg", ".png", ".webp"]
+        
+        if not file.filename:
+            raise HTTPException(
+                status_code=400,
+                detail="Filename is required"
+            )
+        
         file_ext = Path(file.filename).suffix.lower()
         
         if file_ext not in allowed_extensions:
@@ -182,7 +207,7 @@ async def upload_content(
             logger.info(f"Upload successful: content_id={content_id}, user_id={user_id}")
             
             return JSONResponse(
-                status_code=200,
+                status_code=202,  # 202 Accepted for async processing
                 content={
                     "content_id": content_id,
                     "status": "processing",
