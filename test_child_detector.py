@@ -1,8 +1,3 @@
-"""
-Test script to verify child detection is working properly.
-Run this to debug your child detection model.
-"""
-
 import cv2
 import numpy as np
 from ultralytics import YOLO

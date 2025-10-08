@@ -1,8 +1,6 @@
-# detect_nudity_realtime.py
-# Wrapper around NudeNet detector — returns standardized detections list
 from nudenet import NudeDetector
 
-detector = NudeDetector()  # سيحمّل النموذج عند التشغيل
+detector = NudeDetector()  
 
 def detect_nudity(frame, conf_threshold=0.6):
     """
@@ -22,7 +20,6 @@ def detect_nudity(frame, conf_threshold=0.6):
         cat = item.get("class") or item.get("label") or None
         if not cat:
             continue
-        # ignore face detections
         if "face" in cat.lower():
             continue
         score = float(item.get("score", 0) or 0)

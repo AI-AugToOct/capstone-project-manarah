@@ -1,16 +1,9 @@
-# tracker_simple.py
-"""
-Simple IoU-based tracker.
-Keeps short history per track and assigns incremental IDs.
-No external deps.
-"""
-
 import time
 
 class Track:
     def __init__(self, tid, bbox, score, frame_idx):
         self.id = tid
-        self.bboxes = [bbox]        # history of bbox [x1,y1,x2,y2]
+        self.bboxes = [bbox]        
         self.scores = [score]
         self.last_seen = frame_idx
         self.first_seen = frame_idx
@@ -34,12 +27,12 @@ class SimpleIouTracker:
     def __init__(self, iou_threshold=0.4, max_lost_frames=5):
         self.iou_threshold = iou_threshold
         self.max_lost_frames = max_lost_frames
-        self.tracks = {}  # tid -> Track
+        self.tracks = {}  
         self._next_id = 1
 
     @staticmethod
     def iou(boxA, boxB):
-        # boxes: [x1,y1,x2,y2]
+        
         xA = max(boxA[0], boxB[0])
         yA = max(boxA[1], boxB[1])
         xB = min(boxA[2], boxB[2])
@@ -60,7 +53,6 @@ class SimpleIouTracker:
         """
         assignments = {}
         unmatched_dets = set(range(len(detections)))
-        # compute IoU matrix between last bboxes of tracks and new detections
         track_ids = list(self.tracks.keys())
         if track_ids and detections:
             iou_mat = []
@@ -68,10 +60,8 @@ class SimpleIouTracker:
                 tb = self.tracks[tid].last_bbox()
                 row = [self.iou(tb, det['bbox']) for det in detections]
                 iou_mat.append(row)
-            # greedy matching: pick highest IoU pairs
             used_tracks = set()
             used_dets = set()
-            # flatten with indices
             flat = []
             for i, tid in enumerate(track_ids):
                 for j in range(len(detections)):
@@ -88,14 +78,12 @@ class SimpleIouTracker:
                 used_tracks.add(i)
                 used_dets.add(j)
                 unmatched_dets.discard(j)
-        # create new tracks for unmatched detections
         for det_idx in list(unmatched_dets):
             det = detections[det_idx]
             tid = self._next_id
             self._next_id += 1
             self.tracks[tid] = Track(tid, det['bbox'], det['score'], frame_idx)
             assignments[det_idx] = tid
-        # cleanup lost tracks
         to_delete = []
         for tid, tr in self.tracks.items():
             if frame_idx - tr.last_seen > self.max_lost_frames:

@@ -1,9 +1,3 @@
-"""
-Child detector (scene-level) using YOLO .pt + SimpleIouTracker.
-Improved to distinguish between children (class 0) and adults (class 1).
-Only tracks and reports children, ignores adults unless very high confidence of child.
-"""
-
 from ultralytics import YOLO
 import torch
 import numpy as np

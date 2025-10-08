@@ -17,7 +17,7 @@ import sys
 from datetime import datetime
 from collections import deque
 
-# Import detectors
+
 from detect_nudity_realtime import detect_nudity
 from child_detector import analyze_clip_for_child
 from wealth_detector import detect_wealth
@@ -28,29 +28,25 @@ from wealth_detector import detect_wealth
 
 SDK_ADB = "/Users/rayidalshammari/Library/Android/sdk/platform-tools/adb"
 
-# Clip settings
-CLIP_SIZE = 15  # frames per clip (increased for better tracking)
-FRAME_SKIP = 1  # process every frame (1 = all frames, 2 = every other frame)
 
-# Detection thresholds
+CLIP_SIZE = 15  
+FRAME_SKIP = 1  
+
+
 NUDITY_THRESHOLD = 0.6
 WEALTH_THRESHOLD = 0.5
-CHILD_CONF_THRESHOLD = 0.25  # Lower threshold for initial detection
-CHILD_MINIMUM_DECISION_SCORE = 0.45  # Lower minimum for alerts
+CHILD_CONF_THRESHOLD = 0.25  
+CHILD_MINIMUM_DECISION_SCORE = 0.45  
 
-# Output
 OUTPUT_DIR = "violations"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# Verify ADB
 if not os.path.exists(SDK_ADB):
     raise FileNotFoundError(f"ADB not found at {SDK_ADB}")
 
 print(f"[system] تم التهيئة - حجم الكليب: {CLIP_SIZE}, تخطي الإطارات: {FRAME_SKIP}")
 
-# ==============================
-# Frame Capture
-# ==============================
+
 def get_emulator_frame():
     """Capture single frame from Android emulator via ADB screencap."""
     try:
@@ -72,9 +68,7 @@ def get_emulator_frame():
         print(f"\n[خطأ] فشل التقاط الإطار: {e}")
         return None
 
-# ==============================
-# Violation Detection & Saving
-# ==============================
+
 def detect_violations_in_clip(frames):
     """
     Analyze a clip for all violation types.
@@ -87,7 +81,6 @@ def detect_violations_in_clip(frames):
         'wealth': None
     }
     
-    # 1. Child detection (uses full clip with tracking)
     print(f"[تحليل] فحص استغلال الأطفال في {len(frames)} إطار...", end=" ")
     child_result = analyze_clip_for_child(frames, conf=CHILD_CONF_THRESHOLD)
     
@@ -98,7 +91,6 @@ def detect_violations_in_clip(frames):
             violations['child'] = child_result
             print(f"   ✓ تم رصد استغلال أطفال ({child_result['final_decision']})")
     
-    # 2. Nudity detection (check all frames, use highest confidence)
     nudity_detections = []
     best_nudity_frame = None
     best_nudity_score = 0.0
@@ -119,7 +111,6 @@ def detect_violations_in_clip(frames):
             'frame': best_nudity_frame if best_nudity_frame is not None else frames[-1]
         }
     
-    # 3. Wealth detection (check all frames, use highest confidence)
     wealth_detections = []
     best_wealth_frame = None
     best_wealth_score = 0.0
@@ -151,7 +142,6 @@ def save_child_violation(child_data, timestamp):
     img_path = os.path.join(OUTPUT_DIR, f"child_{timestamp}.jpg")
     json_path = os.path.join(OUTPUT_DIR, f"child_{timestamp}.json")
     
-    # Draw only the top detection box
     frame_copy = frame.copy()
     bbox = child_data.get('top_bbox')
     
@@ -159,16 +149,13 @@ def save_child_violation(child_data, timestamp):
         x1, y1, x2, y2 = map(int, bbox)
         cv2.rectangle(frame_copy, (x1, y1), (x2, y2), (0, 0, 255), 3)
         
-        # Add label
         decision_ar = "مؤكد" if child_data['final_decision'] == 'CONFIRMED' else "مشتبه"
         label = f"Child {decision_ar} {child_data['score']:.2f}"
         cv2.putText(frame_copy, label, (x1, y1 - 10), 
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
     
-    # Save image
     cv2.imwrite(img_path, frame_copy)
     
-    # Save JSON
     json_data = {
         'type': 'child_exploitation',
         'type_ar': 'استغلال أطفال',
@@ -193,10 +180,8 @@ def save_nudity_violation(nudity_data, timestamp):
     img_path = os.path.join(OUTPUT_DIR, f"nudity_{timestamp}.jpg")
     json_path = os.path.join(OUTPUT_DIR, f"nudity_{timestamp}.json")
     
-    # Save clean image (no boxes)
     cv2.imwrite(img_path, frame)
     
-    # Save JSON with detection details
     json_data = {
         'type': 'nudity',
         'type_ar': 'محتوى إباحي',
@@ -224,10 +209,8 @@ def save_wealth_violation(wealth_data, timestamp):
     img_path = os.path.join(OUTPUT_DIR, f"wealth_{timestamp}.jpg")
     json_path = os.path.join(OUTPUT_DIR, f"wealth_{timestamp}.json")
     
-    # Save clean image (no boxes)
     cv2.imwrite(img_path, frame)
     
-    # Save JSON with detection details
     json_data = {
         'type': 'wealth',
         'type_ar': 'عرض ثروة',
@@ -270,9 +253,7 @@ def save_violations(violations):
     
     return saved_files
 
-# ==============================
-# Main Processing Loop
-# ==============================
+
 def main_loop():
     """Main monitoring loop with clip-based processing."""
     print(f"[نظام] بدء مراقبة السيميوليتر (Ctrl+C للإيقاف)...")
@@ -285,7 +266,7 @@ def main_loop():
     
     try:
         while True:
-            # Capture frame
+           
             frame = get_emulator_frame()
             if frame is None:
                 time.sleep(0.5)
@@ -293,31 +274,31 @@ def main_loop():
             
             frame_count += 1
             
-            # Skip frames if needed
+            
             if frame_count % FRAME_SKIP != 0:
                 continue
             
-            # Add to buffer
+            
             frame_buffer.append(frame)
             
-            # Process when buffer is full
+            
             if len(frame_buffer) == CLIP_SIZE:
                 clip_count += 1
                 frames_list = list(frame_buffer)
                 
                 print(f"\n[كليب #{clip_count}] تحليل {len(frames_list)} إطار...")
                 
-                # Detect violations
+                
                 violations = detect_violations_in_clip(frames_list)
                 
-                # Check if any violations found
+                
                 has_violation = any(v is not None for v in violations.values())
                 
                 if has_violation:
-                    # Save violations and print alerts
+                    
                     saved = save_violations(violations)
                     
-                    # Build alert message
+                    
                     alerts = []
                     if violations['child']:
                         decision = violations['child']['final_decision']
@@ -337,21 +318,20 @@ def main_loop():
                     
                     sys.stdout.flush()
                 else:
-                    # Clean scene - print dot
+                    
                     print(".", end="", flush=True)
                 
-                # Clear buffer for next clip
+                
                 frame_buffer.clear()
             
-            # Small delay to reduce CPU load
+            
             time.sleep(0.05)
     
     except KeyboardInterrupt:
         print(f"\n\n[نظام] تم الإيقاف. تم معالجة {clip_count} كليب ({frame_count} إطار).")
         print(f"[نظام] المخالفات محفوظة في: {OUTPUT_DIR}")
 
-# ==============================
-# Entry Point
-# ==============================
+
+
 if __name__ == "__main__":
     main_loop()
