@@ -1,4 +1,4 @@
-# 🕌 Manarah — Saudi Content Violation Detection Platform (منارة)
+# 🗼 Manarah — Saudi Content Violation Detection Platform (منارة)
 
 ## 📖 Overview
 **Manarah (منارة)** is an AI-powered monitoring system that detects **content violations in real-time** from social media and uploaded videos.  
