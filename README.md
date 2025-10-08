@@ -46,13 +46,17 @@ branch/
 ### 1. Install dependencies
 ```bash
 pip install -r requirements.txt
+```
 
 ### 2. Configure the ADB path
 Edit config.py and set:
+```bash
 SDK_ADB = "Android/sdk/platform-tools/adb"
-
+```
 ### 3. Run real-time fusion logic
+```bash
 python late_fusion.py
+```
 This will:
 
 Continuously capture emulator frames.
