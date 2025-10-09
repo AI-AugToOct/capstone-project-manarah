@@ -1,0 +1,46 @@
+# Environment
+.env
+.venv
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Data - Ignore actual content but keep structure
+data/content/*
+data/analysis/*
+data/decisions/*
+data/audit/*
+!data/content/.gitkeep
+!data/analysis/.gitkeep
+!data/decisions/.gitkeep
+!data/audit/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+*.tmp
+temp/
+tmp/

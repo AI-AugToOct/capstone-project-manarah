@@ -1,0 +1,246 @@
+"""Text analysis module using Whisper and GPT-4."""
+import logging
+import json
+from pathlib import Path
+from typing import Dict, Any, Optional
+from openai import OpenAI
+
+from src.config import settings
+
+logger = logging.getLogger(__name__)
+
+# Initialize OpenAI client
+client = OpenAI(api_key=settings.openai_api_key)
+
+
+# Comprehensive text analysis prompt
+TEXT_ANALYSIS_PROMPT = """You are an expert content moderator analyzing Arabic text for violations in Saudi social media content.
+
+Analyze this text (transcribed audio or captions) for the following violation categories:
+
+**1. BULLYING & MOCKERY (التنمر والاستهزاء)**
+Direct insults:
+- فاشل (failure), غبي (stupid), احذف حسابك (delete account)
+- Mockery phrases: ما تستحي (aren't you ashamed)
+- Repeated targeting of same individual
+- Encouraging others to mock
+
+**2. VULGAR LANGUAGE (الألفاظ المبتذلة)**
+- Animal insults: كلب، حمار، خنزير
+- Sexual terms: زنا، عاهرة، قحبة
+- Curses: يلعن أبوك، تف عليك
+- Any obscene or profane language
+
+**3. WEALTH BRAGGING (التباهي بالأموال)**
+- "مجرد مصروف جيب" (just pocket money) with money context
+- "السيارة الخامسة" (my fifth car)
+- Price mentions: "ساعتي ب ٥٠ ألف" (my watch 50k)
+- Brand dropping: Gucci, Ferrari, Rolex
+
+**4. TRIBAL INCITEMENT (إثارة القبلية)**
+- Superiority claims: "قبيلتنا أشرف" (our tribe nobler)
+- Derogatory terms: عبيد، خضيري
+- Calls for tribal unity against others
+
+**5. SECTARIAN CONTENT (إثارة الطائفية)**
+- Labels: رافضي، ناصبي، وهابي
+- Takfir (declaring others non-Muslim)
+- Mocking other sects' practices
+
+**6. RACISM (العنصرية)**
+- Slurs: عبد، زنجي (anti-Black terms)
+- Nationality insults: يمني، مصري used negatively
+- Stereotyping: "كل [nationality] هم..."
+
+**7. CHILD EXPLOITATION INDICATORS**
+Text that suggests child exploitation:
+- "شوفوا ولدي" (watch my kid)
+- "تحدي مع طفلي" (challenge with my child)
+- Focus on child as content subject
+
+Return a JSON response with this exact structure:
+{
+  "transcript_language": "ar|en|mixed",
+  "dialect": "gulf|levantine|egyptian|standard|unknown",
+  "violations": [
+    {
+      "category": "bullying|vulgar_language|wealth_bragging|tribal|sectarian|racism|child_exploitation",
+      "confidence": 0.0-1.0,
+      "matched_keywords": ["word1", "word2"],
+      "context": "surrounding text context",
+      "severity": "low|medium|high"
+    }
+  ],
+  "violation_score": 0.0-1.0,
+  "overall_assessment": "brief summary"
+}
+
+If no violations detected, return {"violations": [], "violation_score": 0.0}.
+Be culturally aware and consider Saudi Arabian context. Distinguish between harsh criticism and actual violations."""
+
+
+class TextAnalyzer:
+    """Analyzes text for violations using GPT-4."""
+    
+    @staticmethod
+    def transcribe_audio(audio_path: Path) -> Optional[str]:
+        """Transcribe audio using Whisper API.
+        
+        Args:
+            audio_path: Path to audio file
+            
+        Returns:
+            Transcribed text or None if failed
+        """
+        if not audio_path.exists():
+            logger.warning(f"Audio file not found: {audio_path}")
+            return None
+        
+        try:
+            with open(audio_path, "rb") as audio_file:
+                transcript = client.audio.transcriptions.create(
+                    model=settings.openai_model_audio,
+                    file=audio_file,
+                    language="ar"  # Arabic
+                )
+            
+            logger.info(f"Audio transcribed: {len(transcript.text)} characters")
+            return transcript.text
+            
+        except Exception as e:
+            logger.error(f"Audio transcription failed: {e}")
+            return None
+    
+    @staticmethod
+    def analyze_text(text: str, caption: Optional[str] = None) -> Dict[str, Any]:
+        """Analyze text for violations using GPT-4.
+        
+        Args:
+            text: Transcribed text from audio
+            caption: Optional post caption
+            
+        Returns:
+            Analysis results dictionary
+        """
+        if not text and not caption:
+            return {
+                "violations": [],
+                "violation_score": 0.0,
+                "overall_assessment": "No text to analyze"
+            }
+        
+        # Combine transcript and caption
+        combined_text = ""
+        if caption:
+            combined_text += f"CAPTION: {caption}\n\n"
+        if text:
+            combined_text += f"TRANSCRIPT: {text}"
+        
+        if not combined_text.strip():
+            return {
+                "violations": [],
+                "violation_score": 0.0,
+                "overall_assessment": "No text content"
+            }
+        
+        try:
+            # Call GPT-4 API
+            response = client.chat.completions.create(
+                model=settings.openai_model_reasoner,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": TEXT_ANALYSIS_PROMPT
+                    },
+                    {
+                        "role": "user",
+                        "content": combined_text[:4000]  # Limit text length
+                    }
+                ],
+                max_tokens=1000,
+                temperature=0.2  # Low temperature for consistent results
+            )
+            
+            # Parse response
+            result_text = response.choices[0].message.content
+            
+            # Ensure we have content
+            if not result_text:
+                logger.warning("Empty response from GPT-4")
+                return {
+                    "violations": [],
+                    "violation_score": 0.0,
+                    "overall_assessment": "",
+                    "parse_error": True
+                }
+            
+            # Try to parse as JSON
+            # Strip markdown code blocks if present
+            if result_text.strip().startswith("```"):
+                # Remove ```json or ``` at start
+                result_text = result_text.strip()
+                if result_text.startswith("```json"):
+                    result_text = result_text[7:]  # Remove ```json
+                elif result_text.startswith("```"):
+                    result_text = result_text[3:]  # Remove ```
+                
+                # Remove closing ```
+                if result_text.endswith("```"):
+                    result_text = result_text[:-3]
+                
+                result_text = result_text.strip()
+            
+            result = json.loads(result_text)
+            
+            logger.info(f"Text analyzed, score={result.get('violation_score', 0)}")
+            return result
+            
+        except json.JSONDecodeError as e:
+            logger.warning(f"Failed to parse JSON response from GPT-4: {e}")
+            safe_text = result_text if 'result_text' in locals() and result_text else 'Unknown'
+            logger.warning(f"Raw response: {safe_text[:200]}...")
+            return {
+                "violations": [],
+                "violation_score": 0.0,
+                "overall_assessment": safe_text if safe_text != 'Unknown' else "",
+                "parse_error": True
+            }
+        except Exception as e:
+            logger.error(f"Text analysis failed: {e}")
+            raise
+    
+    @staticmethod
+    def analyze_content_text(
+        audio_path: Optional[Path] = None,
+        caption: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Complete text analysis pipeline.
+        
+        Args:
+            audio_path: Path to audio file (if video)
+            caption: Post caption text
+            
+        Returns:
+            Complete text analysis results
+        """
+        transcript = None
+        
+        # Transcribe audio if available
+        if audio_path and audio_path.exists():
+            transcript = TextAnalyzer.transcribe_audio(audio_path)
+        
+        # Analyze text
+        analysis = TextAnalyzer.analyze_text(transcript or "", caption)
+        
+        # Add transcript to results
+        result = {
+            "transcript": transcript or "",
+            "caption": caption or "",
+            "language": analysis.get("transcript_language", "unknown"),
+            "dialect": analysis.get("dialect", "unknown"),
+            "violations": analysis.get("violations", []),
+            "violation_score": analysis.get("violation_score", 0.0),
+            "overall_assessment": analysis.get("overall_assessment", "")
+        }
+        
+        return result

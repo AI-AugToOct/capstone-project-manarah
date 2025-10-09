@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  backend-dev:
+    build:
+      context: ./capstone-project-manarah-backend
+      dockerfile: Dockerfile
+    command: uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
+    environment:
+      - ENV=development
+      - HOST=0.0.0.0
+      - PORT=8000
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-changeme}
+      - OPENAI_MODEL_VISION=${OPENAI_MODEL_VISION:-gpt-4o}
+      - OPENAI_MODEL_AUDIO=${OPENAI_MODEL_AUDIO:-whisper-1}
+      - OPENAI_MODEL_REASONER=${OPENAI_MODEL_REASONER:-gpt-4}
+      - LOG_LEVEL=DEBUG
+      - ALLOWED_ORIGINS=http://localhost:5173,http://localhost:4173,http://127.0.0.1:5173,http://127.0.0.1:4173
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./capstone-project-manarah-backend/src:/app/src
+      - ./capstone-project-manarah-backend/data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  frontend-dev:
+    build:
+      context: ./capstone-project-manarah
+      dockerfile: Dockerfile
+      target: deps
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:8000
+      - CHOKIDAR_USEPOLLING=true
+    command: sh -c "npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./capstone-project-manarah:/app
+      - /app/node_modules
+    depends_on:
+      backend-dev:
+        condition: service_healthy
